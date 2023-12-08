@@ -101,6 +101,7 @@ def action(text_to_action):
     result_total_json += res_label
     return result_total_json
 
+
 title = st.text_input("Url", "https://9z5q89i1s2u9lw-5000.proxy.runpod.net/v1")
 txt = st.text_area("Text to analyze", """""")
 if st.button("Submit", type="primary"):
