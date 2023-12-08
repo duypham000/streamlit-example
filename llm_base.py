@@ -27,38 +27,27 @@ def checkTicker(tickerSt):
     nouns_arr = re.split("[,\n0-9]", tickerSt)
     nouns_arr = [i for i in nouns_arr if i != ""]
     res_arr = []
-    with open("trans.txt", "w", encoding="utf-8") as f:
-        for nou in nouns_arr:
-            f.write("\n====nou=====\n")
-            f.write(nou + "\n")
-            response = requests.get(
-                "https://api.simplize.vn/api/search/company/suggestions?q="
-                + nou
-                + "&t=&page=0&size=3"
+    for nou in nouns_arr:
+        response = requests.get(
+            "https://api.simplize.vn/api/search/company/suggestions?q="
+            + nou
+            + "&t=&page=0&size=3"
+        )
+        res = None
+        for r in response.json()["data"]:
+            tkr_pos = len("".join(re.findall("<em>.+<\/em>", r["tickerHL"]))) / len(
+                r["tickerHL"]
             )
-            res = None
-            for r in response.json()["data"]:
-                f.write("\n====r=====\n")
-                f.write(r["ticker"] + "\n")
-                tkr_pos = len("".join(re.findall("<em>.+<\/em>", r["tickerHL"]))) / len(
-                    r["tickerHL"]
-                )
-                name_pos = len("".join(re.findall("<em>.+<\/em>", r["nameHL"]))) / len(
-                    r["nameHL"]
-                )
-                f.write(str(tkr_pos))
-                f.write("-")
-                f.write(str(name_pos))
-                if (tickerSt.count(" ") == 0 and tkr_pos == 1) or (
-                    tickerSt.count(" ") > 0 and name_pos >= 0.66
-                ):
-                    res = r["ticker"]
-                    break
-            f.write("\n==res==\n")
-            if res != None:
-                f.write(res)
-                res_arr.append(res)
-            f.write("\n====\n")
+            name_pos = len("".join(re.findall("<em>.+<\/em>", r["nameHL"]))) / len(
+                r["nameHL"]
+            )
+            if (tickerSt.count(" ") == 0 and tkr_pos == 1) or (
+                tickerSt.count(" ") > 0 and name_pos >= 0.66
+            ):
+                res = r["ticker"]
+                break
+        if res != None:
+            res_arr.append(res)
     return res_arr
 
 
@@ -315,9 +304,11 @@ def action(text_to_action):
     result_total_json += res_label
     return result_total_json
 
+
 # with open("res.txt", "w", encoding="utf-8") as f:
 
 app = Flask(__name__)
+
 
 @app.route("/summ", methods=["POST"])
 def summary():
