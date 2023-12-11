@@ -21,7 +21,7 @@ import requests
 import re
 
 # from streamlit_ws_localstorage import injectWebsocketCode, getOrCreateUID
-URL = "https://9z5q89i1s2u9lw-5000.proxy.runpod.net/v1"
+URL = "https://h4ce5m5yp8i7dg-5000.proxy.runpod.net/v1"
 
 
 def getResult(prompt, url):
@@ -50,7 +50,7 @@ def getResult(prompt, url):
         return res
     except:
         st.write("\n\n=========json=========\n" + "ERROR server")
-        return getResult(prompt)
+        return getResult(prompt, url)
 
 
 def checkTicker(tickerSt):
