@@ -6,6 +6,7 @@ import streamlit as st
 import re
 from llm_base import whp, getTicker, checkTicker, getTitle, label
 
+# from streamlit_ws_localstorage import injectWebsocketCode, getOrCreateUID
 
 def getResult(prompt):
     try:
@@ -102,7 +103,13 @@ def action(text_to_action):
     return result_total_json
 
 
-title = st.text_input("Url", "https://9z5q89i1s2u9lw-5000.proxy.runpod.net/v1")
+url = st.text_input("Url", "https://9z5q89i1s2u9lw-5000.proxy.runpod.net/v1")
 txt = st.text_area("Text to analyze", """""")
-if st.button("Submit", type="primary"):
+if st.button("Submit", type="secondary"):
+    URL = url
     st.write("Waitting")
+    if txt != "":
+        action(txt)
+if st.button("Stop", type="primary"):
+    # st.session_state.value = "Foo"
+    st.rerun()
