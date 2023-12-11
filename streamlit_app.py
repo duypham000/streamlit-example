@@ -5,7 +5,7 @@ import openai
 # import pandas as pd
 import streamlit as st
 import re
-from llm_base import whp, getTicker, checkTicker, getTitle, label
+# from llm_base import whp, getTicker, checkTicker, getTitle, label
 import openai
 from rules_settings import (
     # RULE_KEYWORDS,
