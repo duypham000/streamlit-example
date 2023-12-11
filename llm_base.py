@@ -126,28 +126,28 @@ def vi2en(text_to_trans):
     return result
 
 
-def summ(type, text_to_summarize):
-    match type:
-        case 0:
-            rule = RULE_KEYWORDS
-            example = EXAMPLE_KEYWORDS
-        case 1:
-            rule = SUM_RULE_TITLE
-            example = SUMEX_TITLE
+# def summ(type, text_to_summarize):
+#     match type:
+#         case 0:
+#             rule = RULE_KEYWORDS
+#             example = EXAMPLE_KEYWORDS
+#         case 1:
+#             rule = SUM_RULE_TITLE
+#             example = SUMEX_TITLE
 
-    prompt = f"""
-    {rule}
+#     prompt = f"""
+#     {rule}
 
-    {example}
-    - {text_to_summarize}
-    [/INST]
+#     {example}
+#     - {text_to_summarize}
+#     [/INST]
 
-    Please give me the keywords that are present in this document and separate them with commas.
-    Make sure you to only return the keywords and say nothing else. For example, don't say: 
-    "The stocks extracted are"
-    [ANS]
-    """
-    return getResult(prompt)
+#     Please give me the keywords that are present in this document and separate them with commas.
+#     Make sure you to only return the keywords and say nothing else. For example, don't say: 
+#     "The stocks extracted are"
+#     [ANS]
+#     """
+#     return getResult(prompt)
 
 
 def promptwhp(txt):
