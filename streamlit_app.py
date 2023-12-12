@@ -5,8 +5,9 @@ import openai
 # import pandas as pd
 import streamlit as st
 import re
+
 # from llm_base import whp, getTicker, checkTicker, getTitle, label
-import openai
+from openai import OpenAI
 from rules_settings import (
     # RULE_KEYWORDS,
     # EXAMPLE_KEYWORDS,
@@ -17,46 +18,58 @@ from rules_settings import (
     TITLE_RULE,
     LABEL_RULE,
 )
+from examples import TEST_11
 import requests
 import re
 
 # from streamlit_ws_localstorage import injectWebsocketCode, getOrCreateUID
-URL = "https://h4ce5m5yp8i7dg-5000.proxy.runpod.net/v1"
+URL = "https://gw9uzowlq8eadw-5000.proxy.runpod.net/v1"
+# URL = "http://localhost:1234/v1"
+# openai.api_base = URL
+# openai.api_key = "not-needed"  # no need for an API key
+
+client = OpenAI(base_url=URL, api_key="not-needed")
 
 
-def getResult(prompt, url):
+def getResult(prompt):
+    mss = "No message"
+    st.write("\n\n=========Prompt=========\n\n" + prompt)
     try:
-        openai.api_base = url
-        openai.api_key = ""  # no need for an API key
         # completion = generate(prompt)
-        completion = openai.Completion.create(
+        completion = client.completions.create(
             model="local-model",
+            # messages=[
+            #     {"role": "system", "content": "Perform the task to the best of your ability."},
+            #     {"role": "user", "content": prompt},
+            # ],
             prompt=prompt,
-            max_tokens=1000,
+            # max_tokens=1000,
+            temperature=0.7,
+            max_tokens=1500,
+            stop=["<|im_end|>", "<|im_start|>"],
         )
-        res = completion["choices"][0]["text"]
+        mss = str(completion)
+        res = completion.choices[0].text
 
-        st.write("\n\n=========prompt=========\n" + prompt)
         st.write(
             # +"\n\n=========json=========\n"
             # + completion.text
-            "\n\n=========result=========\n"
+            "\n\n=========Result=========\n\n"
         )
         st.write(res)
-        if len(re.findall(r"\[[^\]]*\]", res)) > 0:
-            res = re.split(r"\[[^\]]*\]", res)[0]
-        if res.count("[/ANS]") == 0:
-            res = res.split("[/ANS]")[0]
+        if len(re.findall(r"<\|.*?\|>", res)) > 0:
+            res = re.split(r"<\|.*?\|>", res)[0]
         return res
     except:
-        st.write("\n\n=========json=========\n" + "ERROR server")
-        return getResult(prompt, url)
+        st.write("\n\n=========ERROR server=========\n\n" + mss)
+        return getResult(prompt)
 
 
 def checkTicker(tickerSt):
     nouns_arr = re.split("[,\n0-9]", tickerSt)
-    nouns_arr = [i for i in nouns_arr if i != ""]
+    nouns_arr = [i for i in nouns_arr if i.strip() != ""]
     res_arr = []
+    st.write("=========ticker=========\n\n")
     for nou in nouns_arr:
         response = requests.get(
             "https://api.simplize.vn/api/search/company/suggestions?q="
@@ -64,6 +77,7 @@ def checkTicker(tickerSt):
             + "&t=&page=0&size=3"
         )
         res = None
+        st.write("\n\n====" + nou + "=====\n\n")
         for r in response.json()["data"]:
             tkr_pos = len("".join(re.findall("<em>.+<\/em>", r["tickerHL"]))) / len(
                 r["tickerHL"]
@@ -71,17 +85,16 @@ def checkTicker(tickerSt):
             name_pos = len("".join(re.findall("<em>.+<\/em>", r["nameHL"]))) / len(
                 r["nameHL"]
             )
-            if (tickerSt.count(" ") == 0 and tkr_pos == 1) or (
-                tickerSt.count(" ") > 0 and name_pos >= 0.66
-            ):
+            if (tkr_pos == 1) or (tickerSt.count(" ") > 0 and name_pos >= 0.66):
                 res = r["ticker"]
                 break
+        st.write(str(res) + "-" + str(tkr_pos) + "-" + str(name_pos))
         if res != None:
             res_arr.append(res)
     return res_arr
 
 
-def generate(prompt, url):
+def generate(prompt):
     headers = {
         "Content-Type": "application/json",
     }
@@ -109,21 +122,22 @@ def generate(prompt, url):
 def trans_prompt(req):
     return f"""
     <|im_start|>system
-    You are a professional interpreter from translating stock news. You are translating a news from Vietnamese to English.
+    You are a professional interpreter from translate stock news from Vietnamese to English.
     Your response must always be in English.
     You only give the translation without any chat-based fluff.
-    Only give the translation on your response, dont give me like "In this case" or something like that<|im_end|>
+    Only give the translation on your response, dont give me like "In this case" or something like that<|im_end|>\n
     <|im_start|>user
     translate this text to English:
-    {req}<|im_end|>
+    {req}<|im_end|>\n
     <|im_start|>assistant
     """
 
 
-def vi2en(text_to_trans, url):
+def vi2en(text_to_trans):
     result = ""
     for txt in text_to_trans.split("\n"):
-        result += getResult(trans_prompt(txt.strip()), url)
+        if len(txt.strip()) > 0:
+            result += getResult(trans_prompt(txt.strip()))
 
     return result
 
@@ -132,15 +146,17 @@ def promptwhp(txt):
     return f"""
 <|im_start|>system
 {RULE_TOPIC}
-Do not return any notes or explanations from your response.<|im_end|>
+Do not return any notes or explanations from your response.<|im_end|>\n
 <|im_start|>user
+
 Please extract key points from this text:
-- {txt}
-<|im_end|>
+- {txt}<|im_end|>\n
+
 <|im_start|>assistant
 """
 
-def whp(text_to_summarize, url):
+
+def whp(text_to_summarize):
     txt_word_count = len(text_to_summarize.split())
     ttl_word_count = len(promptwhp(text_to_summarize).split())
     if ttl_word_count > 500:
@@ -156,73 +172,78 @@ def whp(text_to_summarize, url):
                 txt_arr[i] += t
         totalRes = ""
         for t in txt_arr:
-            totalRes += getResult(promptwhp(t), url) + "\n"
+            totalRes += getResult(promptwhp(t)) + "\n"
         return totalRes
     print(txt_word_count)
     print(ttl_word_count)
-    return getResult(promptwhp(text_to_summarize), url)
+    return getResult(promptwhp(text_to_summarize))
 
-def label(text_to_summarize, url):
+
+def label(text_to_summarize):
     prompt = f"""
 <|im_start|>system
+You are a financial expert.
+You can labels financials text provided is Negative or Positive.
+You only give the labels without any chat-based fluff.
+Only give the labels on your response, dont give me like "In this case" or something like that
+Do not return any notes or explanations at the end of your response.<|im_end|>\n
 {LABEL_RULE}
-Do not return any notes or explanations at the end of your response.<|im_end|>
 <|im_start|>user
 Please label each item:
 {text_to_summarize}
-<|im_end|>
+<|im_end|>\n
 <|im_start|>assistant
 """
     txt_word_count = len(text_to_summarize.split())
     ttl_word_count = len(prompt.split())
     print(txt_word_count)
     print(ttl_word_count)
-    return getResult(prompt, url)
+    return getResult(prompt)
 
 
-def getTitle(text_to_summarize, url):
+def getTitle(text_to_summarize):
     prompt = f"""
 <|im_start|>system
 {TITLE_RULE}
-Do not return any notes or explanations at the end of your response.<|im_end|>
+Do not return any notes or explanations at the end of your response.<|im_end|>\n
 <|im_start|>user
 Please give a title for this text:
-- {text_to_summarize}<|im_end|>
+- {text_to_summarize}<|im_end|>\n
 <|im_start|>assistant
     """
     txt_word_count = len(text_to_summarize.split())
     ttl_word_count = len(prompt.split())
     print(txt_word_count)
     print(ttl_word_count)
-    return getResult(prompt, url)
+    return getResult(prompt)
 
 
-def getTicker(text_to_summarize, url):
+def getTicker(text_to_summarize):
     prompt = f"""
 <|im_start|>system
-{TICKERS_RULE}
-Your response must be from text provided.
+You are a financial expert.
+You can find all stock from text.
 You are to the point and only give the answer in isolation without any chat-based fluff.
-Do not return any notes or explanations at the end of your response.<|im_end|>
+Do not return any notes or explanations at the end of your response.<|im_end|>\n
 <|im_start|>user
-please give me all nouns about stock fron this text:
-{text_to_summarize}<|im_end|>
+please give me all stocks from this text:
+{text_to_summarize}<|im_end|>\n
 <|im_start|>assistant
     """
     txt_word_count = len(text_to_summarize.split())
     ttl_word_count = len(prompt.split())
     print(txt_word_count)
     print(ttl_word_count)
-    return getResult(prompt, url)
+    return getResult(prompt)
 
 
-def action(text_to_action, url):
+def action(text_to_action):
     result_total_json = ""
     res_topic = "["
     ticker_res = '["'
 
     raw_res = (
-        whp(text_to_action, url)
+        whp(text_to_action)
         .replace("Key points extracted:", "")
         .replace("Key points:", "")
     )
@@ -241,8 +262,11 @@ def action(text_to_action, url):
 
     # f.write(whp(TEST))
     # f.write(re.split(r"\n", raw_res))
-    raw_tks = getTicker(text_to_action, url)
-    arr_ticker = checkTicker(raw_tks)
+    raw_tks = getTicker(text_to_action)
+    # arr_ticker = checkTicker(raw_tks)
+    arr_ticker = re.sub(
+        r"(\n+\s*[0-9][^0-9a-zA-Z]\s)|(\n+\s*[-]+\s)", "-----", "\n" + raw_tks
+    ).split("-----")
     # tks = raw_tks.strip()
     # arr_ticker = re.sub(
     #     r"(\n+\s*[0-9][^0-9a-zA-Z]\s)|(\n+\s*[-]+\s)", "-----", "\n" + tks
@@ -253,7 +277,7 @@ def action(text_to_action, url):
 
     raw_title = []
     while len(raw_title) == 0:
-        raw_title = re.findall(r"\".*?\"", getTitle(summText), url)
+        raw_title = re.findall(r"\".*?\"", getTitle(summText))
     res_title = ',"title" : ' + raw_title[0]
 
     mat_label = "- " + "\n- ".join(split_res).strip()
@@ -261,7 +285,7 @@ def action(text_to_action, url):
     while len(arr_label) != len(split_res):
         print(len(split_res))
         print(len(arr_label))
-        raw_label = label(mat_label, url).strip()
+        raw_label = label(mat_label).strip()
         arr_label = re.findall("Info|Positive|Negative", raw_label)
     if arr_label.count("Positive") != 0:
         total_label = arr_label.count("Positive") / len(arr_label) * 10
@@ -285,12 +309,12 @@ def action(text_to_action, url):
 
 
 url = st.text_input("Url", URL)
-txt = st.text_area("Text to analyze", """""")
+txt = st.text_area("Text to analyze", TEST_11)
+if st.button("Restart", type="primary"):
+    # st.session_state.value = "Foo"
+    st.rerun()
 if st.button("Submit", type="primary"):
     # URL = url
     st.write("Waitting")
-    if txt != "":
-        action(txt, url)
-if st.button("Stop", type="primary"):
-    # st.session_state.value = "Foo"
-    st.rerun()
+    if len(txt) > 0:
+        st.write(action(vi2en(txt)))

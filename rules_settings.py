@@ -330,20 +330,19 @@ You are a financial expert.
 You can sumary and give a title from a financial text.
 """
 LABEL_RULE = """
-You are a financial expert.
-You can labels financials text provided is Negative or Positive.
-You only give the labels without any chat-based fluff.
-Only give the labels on your response, dont give me like "In this case" or something like that
-
-[INST]Please label each item:
+<|im_start|>user
+Please label each item:
 - ITA climbed by 3.1 percent
 - DIG dropping by 3.11 percent
 - VN-Index falling to 1.150 points
 - VCG increased by 2.56 percent
-[/INST]- Negative
+<|im_end|>
+<|im_start|>assistant
+- Negative
 - Positive
 - Positive
 - Negative
+<|im_end|>
 """
 TICKERS_RULE = """
     You are a financial expert.

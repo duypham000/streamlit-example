@@ -143,3 +143,21 @@ Ngay sau khi công bố thông tin trên, cổ phiếu HAG đã tăng 3 phiên l
 
 Tháng 9 năm ngoái, HAG từng bán gần 162 triệu cổ phiếu với giá 10.500 đồng, dự kiến thu về 1.700 tỷ đồng. Tuy nhiên, diễn biến thị trường không phù hợp nên các nhà đầu tư đã từ chối mua, kế hoạch trên thất bại.
 """
+
+TEST_11 = """
+Thanh khoản HPG đạt gần 1.500 tỷ đồng, chiếm 8% toàn sàn HoSE và là mức cao nhất kể từ đầu tháng 9.
+
+Hôm nay, mã chứng khoán của Công ty cổ phần Tập đoàn Hòa Phát (HPG) ghi nhận giá trị giao dịch gần 1.500 tỷ đồng, cao nhất thị trường. Con số này tăng hơn 100 tỷ đồng so với hôm qua, giúp HPG có hai phiên liên tiếp giao dịch hơn nghìn tỷ đồng. Thanh khoản cổ phiếu này hiện cao nhất 3 tháng qua. Nếu xét về khối lượng giao dịch, gần 52,8 triệu cổ phiếu được sang tay hôm nay là mức cao nhất kể từ đầu tháng 8.
+
+Về thị giá, HPG tăng mạnh chỉ sau gần một tiếng mở cửa, có lúc đạt 28.250 đồng một cổ phiếu, cao hơn 2,4% so với tham chiếu. Mã này duy trì vùng giá trên 28.000 đồng gần suốt buổi sáng trước khi hạ nhiệt ở phiên chiều. Sau cơn rung lắc những phút cuối, HPG đóng cửa ở 27.700 đồng, nhích thêm 0,4% so với hôm qua.
+Nhà đầu tư giao dịch sôi nổi sau thông tin Tập đoàn Hòa Phát bán 709.000 tấn thép các loại trong tháng 11, tăng 12% so với tháng trước và 60% so với cùng kỳ năm ngoái. Riêng thép xây dựng và thép chất lượng cao tăng 63% so với cùng kỳ 2022.
+
+Doanh nghiệp này cho biết, thị trường thép xây dựng trong nước tăng do bắt đầu vào mùa xây dựng và một phần đến từ các giải pháp thúc đẩy giải ngân vốn đầu tư công. Điều này dẫn đến việc tiêu thụ ở cả ba miền của Hòa Phát đều ghi nhận sự tăng trưởng. Trong đó, mức tăng cao nhất là khu vực phía Nam, cao hơn 47% so với tháng trước.
+
+Riêng mã HPG đã chiếm hơn 8% thanh khoản toàn sàn HoSE. Tổng giá trị giao dịch ở thị trường này đạt hơn 17.700 tỷ đồng, giảm hơn 9.700 tỷ so với hôm qua. Dòng tiền của nhà đầu tư tập trung vào nhóm bất động sản, chứng khoán và tài nguyên.
+
+Thanh khoản thị trường hôm nay giảm mạnh dù điểm số có sự cải thiện. Trong phần lớn thời gian giao dịch, VN-Index giữ sắc xanh. Chỉ số đại diện sàn HoSE còn có xu hướng kiểm tra mốc 1.130 nhưng không thành. Chốt phiên, VN-Index tăng gần 3 điểm lên 1.124,4 điểm.
+Tuy nhiên, tâm lý giằng co thể hiện rõ khi thị trường có 283 cổ phiếu cải thiện thị giá, không quá cách biệt so với 221 cổ phiếu giảm. Nhóm bán lẻ có chỉ số ngành tăng mạnh nhất nhờ sự đóng góp của MWG. Ở chiều ngược lại, chứng khoán là nhóm tác động xấu đến chỉ số chung.
+
+Trong khi đó, trên sàn Hà Nội, HNX hôm nay giảm 0,64 điểm sau cơn rung lắc cuối phiên, áp lực chủ yếu đến từ nhóm chứng khoán và bất động sản. Hơn 70% cổ phiếu trên sàn này giảm giá hoặc đi ngang so với tham chiếu.
+"""
