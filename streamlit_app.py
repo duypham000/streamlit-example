@@ -23,8 +23,8 @@ import requests
 import re
 
 # from streamlit_ws_localstorage import injectWebsocketCode, getOrCreateUID
-# URL = "https://93p4x57c4lar2k-5000.proxy.runpod.net/v1"
-URL = "http://localhost:1234/v1"
+URL = "https://93p4x57c4lar2k-5000.proxy.runpod.net/v1"
+# URL = "http://localhost:1234/v1"
 # openai.api_base = URL
 # openai.api_key = "not-needed"  # no need for an API key
 
