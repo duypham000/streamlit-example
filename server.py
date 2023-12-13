@@ -3,7 +3,6 @@ import openai
 # import altair as alt
 # import numpy as np
 # import pandas as pd
-import streamlit as st
 import re
 
 # from llm_base import whp, getTicker, checkTicker, getTitle, label
@@ -18,12 +17,12 @@ from rules_settings import (
     TITLE_RULE,
     LABEL_RULE,
 )
-from examples import TEST_12
+from examples import TEST_10
 import requests
 import re
 
 # from streamlit_ws_localstorage import injectWebsocketCode, getOrCreateUID
-URL = "https://93p4x57c4lar2k-5000.proxy.runpod.net/v1"
+URL = "https://gw9uzowlq8eadw-5000.proxy.runpod.net/v1"
 # URL = "http://localhost:1234/v1"
 # openai.api_base = URL
 # openai.api_key = "not-needed"  # no need for an API key
@@ -33,7 +32,6 @@ client = OpenAI(base_url=URL, api_key="not-needed")
 
 def getResult(prompt):
     mss = "No message"
-    st.write("\n\n=========Prompt=========\n\n" + prompt)
     try:
         # completion = generate(prompt)
         completion = client.completions.create(
@@ -45,23 +43,16 @@ def getResult(prompt):
             prompt=prompt,
             # max_tokens=1000,
             temperature=0.7,
-            max_tokens=2500,
+            max_tokens=1500,
             stop=["<|im_end|>", "<|im_start|>"],
         )
         mss = str(completion)
         res = completion.choices[0].text
 
-        st.write(
-            # +"\n\n=========json=========\n"
-            # + completion.text
-            "\n\n=========Result=========\n\n"
-        )
-        st.write(res)
         if len(re.findall(r"<\|.*?\|>", res)) > 0:
             res = re.split(r"<\|.*?\|>", res)[0]
         return res
     except:
-        st.write("\n\n=========ERROR server=========\n\n" + mss)
         return getResult(prompt)
 
 
@@ -69,7 +60,6 @@ def checkTicker(tickerSt):
     nouns_arr = re.split("[,\n0-9]", tickerSt)
     nouns_arr = [i for i in nouns_arr if i.strip() != ""]
     res_arr = []
-    st.write("=========ticker=========\n\n")
     for nou in nouns_arr:
         response = requests.get(
             "https://api.simplize.vn/api/search/company/suggestions?q="
@@ -77,7 +67,6 @@ def checkTicker(tickerSt):
             + "&t=&page=0&size=3"
         )
         res = None
-        st.write("\n\n====" + nou + "=====\n\n")
         for r in response.json()["data"]:
             tkr_pos = len("".join(re.findall("<em>.+<\/em>", r["tickerHL"]))) / len(
                 r["tickerHL"]
@@ -88,7 +77,6 @@ def checkTicker(tickerSt):
             if (tkr_pos == 1) or (tickerSt.count(" ") > 0 and name_pos >= 0.66):
                 res = r["ticker"]
                 break
-        st.write(str(res) + "-" + str(tkr_pos) + "-" + str(name_pos))
         if res != None:
             res_arr.append(res)
     return res_arr
@@ -112,7 +100,7 @@ def generate(prompt):
     }
 
     response = requests.post(
-        f"{url}/completions",
+        f"{URL}/completions",
         headers=headers,
         json=data,
     )
@@ -307,14 +295,15 @@ def action(text_to_action):
     result_total_json += res_label
     return result_total_json
 
+from flask import Flask, request, jsonify
+import json
+app = Flask(__name__)
 
-url = st.text_input("Url", URL)
-txt = st.text_area("Text to analyze", TEST_12)
-if st.button("Restart", type="primary"):
-    # st.session_state.value = "Foo"
-    st.rerun()
-if st.button("Submit", type="primary"):
-    # URL = url
-    st.write("Waitting")
-    if len(txt) > 0:
-        st.write(action(vi2en(txt)))
+@app.route("/summ", methods=["POST"])
+def summary():
+    data = request.get_json()["text"]
+    resen = vi2en(data)
+    return jsonify(json.loads(action(resen))), 200
+
+if __name__ == "__main__":
+    app.run(debug=True)
