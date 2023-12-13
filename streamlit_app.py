@@ -23,8 +23,8 @@ import requests
 import re
 
 # from streamlit_ws_localstorage import injectWebsocketCode, getOrCreateUID
-URL = "https://93p4x57c4lar2k-5000.proxy.runpod.net/v1"
-# URL = "http://localhost:1234/v1"
+# URL = "https://93p4x57c4lar2k-5000.proxy.runpod.net/v1"
+URL = "http://localhost:1234/v1"
 # openai.api_base = URL
 # openai.api_key = "not-needed"  # no need for an API key
 
@@ -45,7 +45,7 @@ def getResult(prompt):
             prompt=prompt,
             # max_tokens=1000,
             temperature=0.7,
-            max_tokens=2500,
+            # max_tokens=1500,
             stop=["<|im_end|>", "<|im_start|>"],
         )
         mss = str(completion)
@@ -138,8 +138,8 @@ def vi2en(text_to_trans):
     for txt in text_to_trans.split("\n"):
         if len(txt.strip()) > 0:
             result += getResult(trans_prompt(txt.strip()))
-
     return result
+    # return getResult(trans_prompt(text_to_trans.strip()))
 
 
 def promptwhp(txt):
@@ -150,7 +150,7 @@ Do not return any notes or explanations from your response.<|im_end|>\n
 <|im_start|>user
 
 Please extract key points from this text:
-- {txt}<|im_end|>\n
+{txt}<|im_end|>\n
 
 <|im_start|>assistant
 """
@@ -159,21 +159,21 @@ Please extract key points from this text:
 def whp(text_to_summarize):
     txt_word_count = len(text_to_summarize.split())
     ttl_word_count = len(promptwhp(text_to_summarize).split())
-    if ttl_word_count > 500:
-        txtRes = text_to_summarize.split("\n")
-        txt_arr = [""]
-        i = 0
-        for t in txtRes:
-            if len(txt_arr[i].split()) + len(t.split()) <= 500:
-                txt_arr[i] += t
-            else:
-                i += 1
-                txt_arr.append("")
-                txt_arr[i] += t
-        totalRes = ""
-        for t in txt_arr:
-            totalRes += getResult(promptwhp(t)) + "\n"
-        return totalRes
+    # if ttl_word_count > 500:
+    #     txtRes = text_to_summarize.split("\n")
+    #     txt_arr = [""]
+    #     i = 0
+    #     for t in txtRes:
+    #         if len(txt_arr[i].split()) + len(t.split()) <= 500:
+    #             txt_arr[i] += t
+    #         else:
+    #             i += 1
+    #             txt_arr.append("")
+    #             txt_arr[i] += t
+    #     totalRes = ""
+    #     for t in txt_arr:
+    #         totalRes += getResult(promptwhp(t)) + "\n"
+    #     return totalRes
     print(txt_word_count)
     print(ttl_word_count)
     return getResult(promptwhp(text_to_summarize))
@@ -208,7 +208,7 @@ def getTitle(text_to_summarize):
 Do not return any notes or explanations at the end of your response.<|im_end|>\n
 <|im_start|>user
 Please give a title for this text:
-- {text_to_summarize}<|im_end|>\n
+{text_to_summarize}<|im_end|>\n
 <|im_start|>assistant
     """
     txt_word_count = len(text_to_summarize.split())
@@ -248,11 +248,17 @@ def action(text_to_action):
         .replace("Key points:", "")
     )
     split_res = re.sub(
-        r"(\n+\s*[0-9][^0-9a-zA-Z]\s)|(\n+\s*[-]+\s)", "-----", "\n" + raw_res
+        r"(\n+\s*[0-9]+[^0-9a-zA-Z]\s)|(\n+\s*[-]+\s)", "-----", "\n" + raw_res
     ).split("-----")
     # if len(split_res) < 2:
     #     split_res = re.findall(r"\n\s*[-]+\s.+", raw_res)
-    split_res = [i for i in split_res if i != ""]
+    split_res = [
+        i
+        for i in split_res
+        if i != ""
+        and not i.__contains__("Key points")
+        and not i.__contains__("key points")
+    ]
     for e in split_res:
         split_e = e.strip()
         if len(split_e.split()) > 0:
@@ -265,7 +271,7 @@ def action(text_to_action):
     raw_tks = getTicker(text_to_action)
     # arr_ticker = checkTicker(raw_tks)
     arr_ticker = re.sub(
-        r"(\n+\s*[0-9][^0-9a-zA-Z]\s)|(\n+\s*[-]+\s)", "-----", "\n" + raw_tks
+        r"(\n+\s*[0-9]+[^0-9a-zA-Z]\s)|(\n+\s*[-]+\s)", "-----", "\n" + raw_tks
     ).split("-----")
     # tks = raw_tks.strip()
     # arr_ticker = re.sub(
