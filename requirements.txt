@@ -1,5 +1,2 @@
-altair
-pandas
 streamlit
-openai
-flask
+google-generativeai
