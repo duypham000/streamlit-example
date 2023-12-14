@@ -12,27 +12,27 @@ Trong khi đó, cổ phiếu VRE đang là mã tiên phong trong việc hồi ph
 Với việc bộ 3 VIC - VHM - VRE cho tín hiệu tạo đáy, thị trường chứng khoán nhiều khả năng sẽ dừng lại đà giảm điểm cùng với sự cộng hưởng khả quan các nhóm ngành. Dù vậy, sau nhịp giảm mạnh và tạo đáy, quá trình vận động tích lũy và đi lên của của các cổ phiếu sẽ không hề ngắn.
 Trong quý 4/2023, việc cổ phiếu VIC có thể hồi phục trở lại ngưỡng 53.0 - 55.0 đã là thành công với cổ phiếu \"anh cả\" ngành bất động sản. Tuy nhiên với dự phóng này, VN-Index có cơ hội quay lại trở ngưỡng điểm bình thường như trước nhịp điều chỉnh.
 JSON: {
-  "title": "VIC, VHM, VRE giảm mạnh, có dấu hiệu tạo đáy",
-  "key_points": [
+  'title': 'VIC, VHM, VRE giảm mạnh, có dấu hiệu tạo đáy',
+  'key_points': [
       {
-        "label": "Negative",
-        "text": "VIC giảm gần 40% từ mức 75.600 đồng về 45.950 đồng/cp"
+        'label': 'Negative',
+        'text': 'VIC giảm gần 40% từ mức 75.600 đồng về 45.950 đồng/cp'
       },
       {
-        "label": "Positive",
-        "text": "VHM tăng 27% từ mức 46.050 đồng lên tới 62.900 đồng/cp"
+        'label': 'Positive',
+        'text': 'VHM tăng 27% từ mức 46.050 đồng lên tới 62.900 đồng/cp'
       },
       {
-        "label": "Negative",
-        "text": "VRE giảm 12% từ 31.300 đồng về 27.450 đồng/cp."
+        'label': 'Negative',
+        'text': 'VRE giảm 12% từ 31.300 đồng về 27.450 đồng/cp.'
       },
       {
-        "label": "Negative",
-        "text": "VIC đã có gần 2 tuần đi nganh trong vùng 43.x - 46.x (thấp nhất 6 năm) với lực bán và thanh khoản giảm mạnh."
+        'label': 'Negative',
+        'text': 'VIC đã có gần 2 tuần đi nganh trong vùng 43.x - 46.x (thấp nhất 6 năm) với lực bán và thanh khoản giảm mạnh.'
       },
       {
-        "label": "Info",
-        "text": "VRE đang là mã tiên phong trong việc hồi phục khi đã tăng 7,6% trong 6 phiên trở lại đây."
+        'label': 'Info',
+        'text': 'VRE đang là mã tiên phong trong việc hồi phục khi đã tăng 7,6% trong 6 phiên trở lại đây.'
       }
   ]
 }

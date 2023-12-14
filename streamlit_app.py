@@ -93,7 +93,11 @@ def summ(txt):
         if i["label"] == "Negative":
             tt += 1
     tpc.update(tcks)
-    tpc.update({"segment": po / tt * 10})
+    if po == 0:
+        seg = 0
+    else:
+        seg = po / tt * 10
+    tpc.update({"segment": seg})
     return tpc
 
 
@@ -115,7 +119,7 @@ if st.button("Submit", type="primary"):
     # URL = url
     st.write("Waitting")
     if len(txt) > 0:
-        res = summ(txt)
+        res = summ(txt.replace('"', "'"))
         st.write("\n")
         st.write("Result:")
         st.write("\n")
