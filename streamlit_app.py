@@ -1,6 +1,5 @@
 import google.generativeai as genai
 import examples
-import rules_settings
 import streamlit as st
 import json
 
@@ -102,8 +101,8 @@ def summ(txt):
         if i["label"] == "Negative":
             tt += 1
     tpc.update(tcks)
-    if po == 0:
-        seg = 0
+    if tt == 0:
+        seg = 5
     else:
         seg = po / tt * 10
     tpc.update({"segment": seg})
