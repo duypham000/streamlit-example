@@ -74,15 +74,24 @@ A:"""
     )
 
 
+def getJson(prompt):
+    try:
+        res = model.generate_content(prompt)
+        json.loads(res.text)
+        return res
+    except:
+        return getJson(prompt)
+
+
 def summ(txt):
-    topics = model.generate_content(prompt_topic(txt))
+    topics = getJson(prompt_topic(txt))
     st.write(topics.text)
     st.write("\n")
-    res_stock = model.generate_content(prompt_company(txt))
+    tpc = json.loads(topics.text)
+    res_stock = getJson(prompt_company(txt))
     st.write(res_stock.text)
     st.write("\n")
     # seg and sum
-    tpc = json.loads(topics.text)
     tcks = json.loads(res_stock.text)
     tt = 0
     po = 0
