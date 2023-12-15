@@ -1,5 +1,5 @@
 LABEL = """
-Q: Give me title and key points this text, each key points, give a label negative, positive or info:
+Q: Give me title and key points this text, each key points, give a label negative, positive, info or advertisement:
 Cổ phiếu VIC (Vingroup) đã có gần 2 tuần đi nganh vùng 43.x - 46.x với lực bán và thanh khoản giảm mạnh.
 Kết tuần giao dịch giằng co từ 2 - 6/10, VN-Index giảm 26 điểm từ ngưỡng 1.154.
 Chỉ sau 1 tháng kể từ thời điểm chinh phục bất thành cao điểm 1.250, thị trường chứng khoán đã mất gần 120 điểm (-9,36%); thanh khoản trong gần 2 tuần nay liên tục giảm mạnh về dưới 20.000 tỷ đồng/phiên cho thấy tâm lý nhà đầu tư vẫn đang rất thận trọng. 

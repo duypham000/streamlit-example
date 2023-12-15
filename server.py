@@ -73,9 +73,11 @@ A:"""
     )
 
 
-def getJson(prompt):
+def getJson(prompt, temp=1):
     try:
-        res = model.generate_content(prompt)
+        res = model.generate_content(
+            prompt, generation_config=genai.types.GenerationConfig(temperature=temp)
+        )
         json.loads(res.text)
         return res
     except:
@@ -83,7 +85,7 @@ def getJson(prompt):
 
 
 def summ(txt):
-    topics = getJson(prompt_topic(txt))
+    topics = getJson(prompt_topic(txt, 0.1))
     st.write(topics.text)
     st.write("\n")
     tpc = json.loads(topics.text)
@@ -101,8 +103,8 @@ def summ(txt):
         if i["label"] == "Negative":
             tt += 1
     tpc.update(tcks)
-    if po == 0:
-        seg = 0
+    if tt == 0:
+        seg = 5
     else:
         seg = po / tt * 10
     tpc.update({"segment": seg})
@@ -145,6 +147,7 @@ def summary():
     data = request.get_json()["text"]
     res = summ(data.replace('"', "'"))
     return jsonify(res), 200
+
 
 if __name__ == "__main__":
     app.run(debug=True)

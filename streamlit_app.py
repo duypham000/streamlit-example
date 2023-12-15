@@ -21,11 +21,13 @@ def prompt_topic(txt):
 You are a financial expert.
 You are to the point and only give the answer in isolation without any chat-based fluff.
 Your response must be JSON format.
+Each key points must have 1 or 2 sentence and less than 255 character.
+Your key points must be less than 10.
 Dont mark response by anything. For example: "```json"
 """
         + rule_ex.LABEL
         + """
-Q: Give me title and key points this text, each key points, give a label negative, positive or info:
+Q: Give me title and key points this text, each key points, give a label negative, positive, info or advertisement:
 """
         + txt
         + """
@@ -73,9 +75,13 @@ A:"""
     )
 
 
-def getJson(prompt):
+def getJson(prompt, temp=1):
+    st.write("temp: " + str(temp))
     try:
-        res = model.generate_content(prompt)
+        res = model.generate_content(
+            prompt,
+            generation_config=genai.types.GenerationConfig(temperature=temp),
+        )
         json.loads(res.text)
         return res
     except:
@@ -83,7 +89,7 @@ def getJson(prompt):
 
 
 def summ(txt):
-    topics = getJson(prompt_topic(txt))
+    topics = getJson(prompt_topic(txt), 0.1)
     st.write(topics.text)
     st.write("\n")
     tpc = json.loads(topics.text)
