@@ -48,7 +48,7 @@ Hôm nay, mã chứng khoán của Công ty cổ phần Tập đoàn Hòa Phát 
 Hưng Thịnh Land gia hạn ngày tất toán 15 tháng cho 6 lô trái phiếu tổng mệnh giá 1.600 tỷ đồng, dời áp lực trả nợ sang tháng 11/2024.
 Trước khi gia hạn, Tập đoàn Hưng Thịnh và các doanh nghiệp trong hệ sinh thái nhiều lần công bố thông tin về việc chậm thanh toán gốc và lãi trái phiếu. Lý do chung là thị trường tài chính, thị trường giao dịch bất động sản diễn biến không thuận lợi dẫn đến doanh nghiệp chưa thu xếp kịp nguồn tiền để thanh toán đúng hạn so với kế hoạch.
 Một ngày sau khi công bố Chứng khoán LPBank cùng hai nhà đầu tư mua cổ phiếu, Hoàng Anh Gia Lai hủy thông tin với lý do "báo cáo sai sót".
-A: {
+JSON: {
     "tickers": [
         {
             "name": "Công ty cổ phần Tập đoàn Hòa Phát",
@@ -71,7 +71,26 @@ Q: Find all company name and stock code from this text:
 """
         + txt
         + """
-A:"""
+JSON:"""
+    )
+
+
+def prompt_ads(txt):
+    return (
+        """
+You are a financial expert.
+You are to the point and only give the answer in isolation without any chat-based fluff.
+Your response must be JSON format.
+Dont mark response by anything. For example: "```json"
+"""
+        + rule_ex.ADS
+        + """
+Q: This text is ads or not:
+"""
+        + txt
+        + """
+A:
+"""
     )
 
 
@@ -82,6 +101,9 @@ def getJson(prompt, temp=1):
             prompt,
             generation_config=genai.types.GenerationConfig(temperature=temp),
         )
+        st.write("\n==========================\n")
+        st.write(res.text)
+        st.write("\n")
         json.loads(res.text)
         return res
     except:
@@ -90,12 +112,10 @@ def getJson(prompt, temp=1):
 
 def summ(txt):
     topics = getJson(prompt_topic(txt), 0.1)
-    st.write(topics.text)
-    st.write("\n")
     tpc = json.loads(topics.text)
     res_stock = getJson(prompt_company(txt))
-    st.write(res_stock.text)
-    st.write("\n")
+    res_ads = getJson(prompt_ads(txt))
+    ads = json.loads(res_ads.text)
     # seg and sum
     tcks = json.loads(res_stock.text)
     tt = 0
@@ -107,6 +127,7 @@ def summ(txt):
         if i["label"] == "Negative":
             tt += 1
     tpc.update(tcks)
+    tpc.update(ads)
     if tt == 0:
         seg = 5
     else:
