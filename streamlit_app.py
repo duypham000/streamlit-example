@@ -111,13 +111,14 @@ def getJson(prompt, temp=1):
 
 
 def summ(txt):
-    topics = getJson(prompt_topic(txt), 0.1)
+    topics = getJson(prompt_topic(txt), 0.5)
     tpc = json.loads(topics.text)
     res_stock = getJson(prompt_company(txt))
     res_ads = getJson(prompt_ads(txt))
     ads = json.loads(res_ads.text)
     # seg and sum
     tcks = json.loads(res_stock.text)
+    # ifo = 0
     tt = 0
     po = 0
     for i in tpc["key_points"]:
@@ -126,6 +127,8 @@ def summ(txt):
             po += 1
         if i["label"] == "Negative":
             tt += 1
+        # if i["label"] == "Info":
+        #     ifo += 1
     tpc.update(tcks)
     tpc.update(ads)
     if tt == 0:

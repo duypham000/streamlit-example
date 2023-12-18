@@ -21,11 +21,13 @@ def prompt_topic(txt):
 You are a financial expert.
 You are to the point and only give the answer in isolation without any chat-based fluff.
 Your response must be JSON format.
+Each key points must have 1 or 2 sentence and less than 255 character.
+Your key points must be less than 10.
 Dont mark response by anything. For example: "```json"
 """
         + rule_ex.LABEL
         + """
-Q: Give me title and key points this text, each key points, give a label negative, positive or info:
+Q: Give me title and key points this text, each key points, give a label negative, positive, info or advertisement:
 """
         + txt
         + """
@@ -46,7 +48,7 @@ Hôm nay, mã chứng khoán của Công ty cổ phần Tập đoàn Hòa Phát 
 Hưng Thịnh Land gia hạn ngày tất toán 15 tháng cho 6 lô trái phiếu tổng mệnh giá 1.600 tỷ đồng, dời áp lực trả nợ sang tháng 11/2024.
 Trước khi gia hạn, Tập đoàn Hưng Thịnh và các doanh nghiệp trong hệ sinh thái nhiều lần công bố thông tin về việc chậm thanh toán gốc và lãi trái phiếu. Lý do chung là thị trường tài chính, thị trường giao dịch bất động sản diễn biến không thuận lợi dẫn đến doanh nghiệp chưa thu xếp kịp nguồn tiền để thanh toán đúng hạn so với kế hoạch.
 Một ngày sau khi công bố Chứng khoán LPBank cùng hai nhà đầu tư mua cổ phiếu, Hoàng Anh Gia Lai hủy thông tin với lý do "báo cáo sai sót".
-A: {
+JSON: {
     "tickers": [
         {
             "name": "Công ty cổ phần Tập đoàn Hòa Phát",
@@ -69,15 +71,39 @@ Q: Find all company name and stock code from this text:
 """
         + txt
         + """
-A:"""
+JSON:"""
+    )
+
+
+def prompt_ads(txt):
+    return (
+        """
+You are a financial expert.
+You are to the point and only give the answer in isolation without any chat-based fluff.
+Your response must be JSON format.
+Dont mark response by anything. For example: "```json"
+"""
+        + rule_ex.ADS
+        + """
+Q: This text is ads or not:
+"""
+        + txt
+        + """
+A:
+"""
     )
 
 
 def getJson(prompt, temp=1):
+    st.write("temp: " + str(temp))
     try:
         res = model.generate_content(
-            prompt, generation_config=genai.types.GenerationConfig(temperature=temp)
+            prompt,
+            generation_config=genai.types.GenerationConfig(temperature=temp),
         )
+        st.write("\n==========================\n")
+        st.write(res.text)
+        st.write("\n")
         json.loads(res.text)
         return res
     except:
@@ -85,15 +111,14 @@ def getJson(prompt, temp=1):
 
 
 def summ(txt):
-    topics = getJson(prompt_topic(txt, 0.1))
-    st.write(topics.text)
-    st.write("\n")
+    topics = getJson(prompt_topic(txt), 0.5)
     tpc = json.loads(topics.text)
     res_stock = getJson(prompt_company(txt))
-    st.write(res_stock.text)
-    st.write("\n")
+    res_ads = getJson(prompt_ads(txt))
+    ads = json.loads(res_ads.text)
     # seg and sum
     tcks = json.loads(res_stock.text)
+    # ifo = 0
     tt = 0
     po = 0
     for i in tpc["key_points"]:
@@ -102,38 +127,16 @@ def summ(txt):
             po += 1
         if i["label"] == "Negative":
             tt += 1
+        # if i["label"] == "Info":
+        #     ifo += 1
     tpc.update(tcks)
+    tpc.update(ads)
     if tt == 0:
         seg = 5
     else:
         seg = po / tt * 10
     tpc.update({"segment": seg})
     return tpc
-
-
-# with open("log.txt", "a", encoding="utf-8") as f:
-#     # f.write(res_company.text)
-#     # f.write("\n")
-#     f.write(res_stock.text)
-#     f.write("\n")
-#     f.write(topics.text)
-#     f.write("\n")
-#     f.write("\n")
-#     f.write(str(tpc))
-
-
-txt = st.text_area("Text to analyze", examples.TEST_11)
-if st.button("Restart", type="primary"):
-    st.rerun()
-if st.button("Submit", type="primary"):
-    # URL = url
-    st.write("Waitting")
-    if len(txt) > 0:
-        res = summ(txt.replace('"', "'"))
-        st.write("\n")
-        st.write("Result:")
-        st.write("\n")
-        st.json(res)
 
 
 from flask import Flask, request, jsonify
