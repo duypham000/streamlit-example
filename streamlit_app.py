@@ -119,7 +119,7 @@ def getJson(prompt, temp=1):
     st.write("temp: " + str(temp))
     try:
         res = gemini.getJson(prompt, temp)
-        st.write("\n==========================\n")
+        st.write("\n============output==============\n\n")
         st.write(res.text)
         st.write("\n")
         json.loads(res.text)
@@ -168,23 +168,22 @@ def summ(txt):
     ifo = 0
     tt = 0
     po = 0
-    for i in tpc["key_points"]:
-        if i["label"] == "Positive":
-            tt += 1
-            po += 1
-        if i["label"] == "Negative":
-            tt += 1
-        if i["label"] == "Info":
-            ifo += 1
-        # if i["label"] == "Info":
-        #     ifo += 1
-    # tpc.update(tcks)
-    # tpc.update(ads)
-    if tt == 0:
-        seg = 5
+    if "key_points" in tpc:
+        for i in tpc["key_points"]:
+            if i["label"] == "Positive":
+                tt += 1
+                po += 1
+            if i["label"] == "Negative":
+                tt += 1
+            if i["label"] == "Info":
+                ifo += 1
+        if tt == 0:
+            seg = 5
+        else:
+            seg = po / tt * 10
+        tpc.update({"segment": seg, "info": ifo / len(tpc["key_points"])})
     else:
-        seg = po / tt * 10
-    tpc.update({"segment": seg, "info": ifo / len(tpc["key_points"])})
+        tpc.update({"is_ads": 1})
     return tpc
 
 
@@ -199,6 +198,34 @@ def summ(txt):
 #     f.write(str(tpc))
 
 
+def printRes(json):
+    st.write("\n\n===============Title===============\n\n")
+    try:
+        st.write(json["title"] + "\n")
+    except:
+        st.write("No title\n")
+    st.write("\n\n===============Ticker===============\n\n")
+    try:
+        for e in json["tickers"]:
+            st.write(e["name"] + ": " + e["code"] + "\n")
+    except:
+        st.write("No tickers\n")
+    st.write("\n\n===============Topic===============\n\n")
+    try:
+        for e in json["key_points"]:
+            st.write("- " + e["text"] + "\n")
+    except:
+        st.write("No key points\n")
+    st.write("\n\n===============Ads===============\n\n")
+    try:
+        if json["is_ads"] == 1:
+            st.write("là bài quảng cáo\n")
+        else:
+            st.write("là bài phân tích\n")
+    except:
+        st.write("là bài phân tích\n")
+
+
 txt = st.text_area("Text to analyze", examples.TEST_11)
 if st.button("Restart", type="primary"):
     st.rerun()
@@ -208,6 +235,5 @@ if st.button("Submit", type="primary"):
     if len(txt) > 0:
         res = summ(txt.replace('"', "'"))
         st.write("\n")
-        st.write("Result:")
-        st.write("\n")
-        st.json(res)
+        # st.json(res)
+        printRes(res)
