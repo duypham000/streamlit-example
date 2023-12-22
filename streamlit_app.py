@@ -224,6 +224,22 @@ def printRes(json):
             st.write("là bài phân tích\n")
     except:
         st.write("là bài phân tích\n")
+    st.write("\n\n===============Đánh giá===============\n\n")
+    try:
+        if json["segment"] >= 5:
+            if json["segment"] == 5:
+                st.write("Trung lập (", json["segment"], "/10)\n")
+            else:
+                st.write("Tích cực (%s/10)\n", json["segment"])
+        else:
+            st.write("Tiêu cực (%s/10)\n", json["segment"])
+    except:
+        st.write("Không có đánh giá\n")
+    st.write("\n\n===============Mật độ tin trung lập===============\n\n")
+    try:
+        st.write(int(json["info"] * 100), "%\n")
+    except:
+        st.write("Không có đánh giá\n")
 
 
 txt = st.text_area("Text to analyze", examples.TEST_11)
