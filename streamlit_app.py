@@ -230,9 +230,9 @@ def printRes(json):
             if json["segment"] == 5:
                 st.write("Trung lập (", json["segment"], "/10)\n")
             else:
-                st.write("Tích cực (%s/10)\n", json["segment"])
+                st.write("Tích cực  (", json["segment"], "/10)\n")
         else:
-            st.write("Tiêu cực (%s/10)\n", json["segment"])
+            st.write("Tiêu cực (", json["segment"], "/10)\n")
     except:
         st.write("Không có đánh giá\n")
     st.write("\n\n===============Mật độ tin trung lập===============\n\n")
