@@ -1,4 +1,5 @@
 import google.generativeai as genai
+import gemini
 import examples
 import streamlit as st
 import json
@@ -94,13 +95,30 @@ A:
     )
 
 
+def prompt_all(txt):
+    return (
+        """
+You are a Vietnamese financial expert.
+You are to the point and only give the answer in isolation without any chat-based fluff.
+Your response must be JSON format.
+Each key points must have 1 or 2 sentence and less than 255 character.
+Your key points must be less than 10.
+Dont mark response by anything. For example: "```json"
+"""
+        + rule_ex.LABEL
+        + """
+"""
+        + txt
+        + """
+JSON:
+    """
+    )
+
+
 def getJson(prompt, temp=1):
     st.write("temp: " + str(temp))
     try:
-        res = model.generate_content(
-            prompt,
-            generation_config=genai.types.GenerationConfig(temperature=temp),
-        )
+        res = gemini.getJson(prompt, temp)
         st.write("\n==========================\n")
         st.write(res.text)
         st.write("\n")
@@ -110,15 +128,44 @@ def getJson(prompt, temp=1):
         return getJson(prompt)
 
 
+# def summ(txt):
+#     topics = getJson(prompt_topic(txt), 0.5)
+#     tpc = json.loads(topics.text)
+#     res_stock = getJson(prompt_company(txt))
+#     res_ads = getJson(prompt_ads(txt))
+#     ads = json.loads(res_ads.text)
+#     # seg and sum
+#     tcks = json.loads(res_stock.text)
+#     # ifo = 0
+#     tt = 0
+#     po = 0
+#     for i in tpc["key_points"]:
+#         if i["label"] == "Positive":
+#             tt += 1
+#             po += 1
+#         if i["label"] == "Negative":
+#             tt += 1
+#         # if i["label"] == "Info":
+#         #     ifo += 1
+#     tpc.update(tcks)
+#     tpc.update(ads)
+#     if tt == 0:
+#         seg = 5
+#     else:
+#         seg = po / tt * 10
+#     tpc.update({"segment": seg})
+#     return tpc
+
+
 def summ(txt):
-    topics = getJson(prompt_topic(txt), 0.5)
-    tpc = json.loads(topics.text)
-    res_stock = getJson(prompt_company(txt))
-    res_ads = getJson(prompt_ads(txt))
-    ads = json.loads(res_ads.text)
-    # seg and sum
-    tcks = json.loads(res_stock.text)
-    # ifo = 0
+    res = getJson(prompt_all(txt), 0.5)
+    tpc = json.loads(res.text)
+    # res_stock = getJson(prompt_company(txt))
+    # res_ads = getJson(prompt_ads(txt))
+    # ads = json.loads(res_ads.text)
+    # # seg and sum
+    # tcks = json.loads(res_stock.text)
+    ifo = 0
     tt = 0
     po = 0
     for i in tpc["key_points"]:
@@ -127,15 +174,17 @@ def summ(txt):
             po += 1
         if i["label"] == "Negative":
             tt += 1
+        if i["label"] == "Info":
+            ifo += 1
         # if i["label"] == "Info":
         #     ifo += 1
-    tpc.update(tcks)
-    tpc.update(ads)
+    # tpc.update(tcks)
+    # tpc.update(ads)
     if tt == 0:
         seg = 5
     else:
         seg = po / tt * 10
-    tpc.update({"segment": seg})
+    tpc.update({"segment": seg, "info": ifo / len(tpc["key_points"])})
     return tpc
 
 
