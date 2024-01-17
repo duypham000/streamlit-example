@@ -1,15 +1,18 @@
 import google.generativeai as genai
 import gemini
+from dotenv import load_dotenv
+import os
 import examples
 import streamlit as st
 import json
 
+load_dotenv()
+
 import rule_ex
 
 # Or use `os.getenv('GOOGLE_API_KEY')` to fetch an environment variable.
-GOOGLE_API_KEY = "AIzaSyCEupKbI7TZJRW_zhOOSmwUT6H2g-n4mWM"
 # GOOGLE_API_KEY=userdata.get('GOOGLE_API_KEY')
-
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 genai.configure(api_key=GOOGLE_API_KEY)
 
 model = genai.GenerativeModel("gemini-pro")
